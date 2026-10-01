@@ -20,7 +20,7 @@ func main() {
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		host, _ := os.Hostname()
-		fmt.Fprintf(w, "hola desde qs-sample-app api (pod %s, versión %q)\n", host, version)
+		fmt.Fprintf(w, "hola desde qs-sample-app api, desplegado solo con un git push (pod %s, versión %q)\n", host, version)
 	})
 
 	log.Printf("api escuchando en :%s", port)
