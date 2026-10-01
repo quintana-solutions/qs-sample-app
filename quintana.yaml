@@ -16,7 +16,7 @@ services:
     routes:
       - host: sample-api
         exposure: private
-        auth: sso
+        auth: none   # sso llega en la fase 4b de la plataforma
   worker:
     type: worker
     replicas: 1
