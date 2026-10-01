@@ -1,0 +1,23 @@
+# Contrato con la plataforma (ver qs-flux/docs/contrato.md): qué servicios tiene la app y qué necesita cada uno.
+apiVersion: quintana.dev/v1
+kind: App
+metadata:
+  name: qs-sample-app
+build:
+  timeout: 15m
+services:
+  api:
+    type: web
+    port: 8080
+    health: /healthz
+    replicas: 2
+    resources: { cpu: 100m, memory: 64Mi }
+    env: { LOG_LEVEL: info }
+    routes:
+      - host: sample-api
+        exposure: private
+        auth: sso
+  worker:
+    type: worker
+    replicas: 1
+    env: { INTERVAL: 30s }
