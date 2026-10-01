@@ -11,7 +11,8 @@ servicios**, cada uno con su `Dockerfile`, que el pipeline construye en paralelo
 ## Contrato de imagen (lo que la plataforma exige a cualquier repo)
 
 1. Un `Dockerfile` por servicio en `services/<nombre>/`; el contexto de build es esa carpeta.
-2. Corre como **usuario no root** (aquí `distroless/static:nonroot`, uid 65532).
+2. Corre como **usuario no root, con `USER` numérico** (aquí `USER 65532:65532`, el `nonroot` de distroless): Kubernetes
+   solo puede comprobar que no es root con un UID numérico.
 3. Si sirve HTTP: puerto declarado con `EXPOSE` y un `/healthz` que responde 200.
 4. Configuración por **variables de entorno**; logs a **stdout/stderr**.
 5. Imágenes base **fijadas por digest** (`@sha256:...`), para que el build sea reproducible.

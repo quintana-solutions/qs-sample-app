@@ -5,8 +5,9 @@ COPY go.mod ./
 COPY *.go ./
 RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/worker .
 
-# Etapa 2: solo el binario sobre distroless (sin shell ni paquetes), como usuario no root (uid 65532).
+# Etapa 2: solo el binario sobre distroless (sin shell ni paquetes), como usuario no root. USER numérico (65532 = nonroot
+# de distroless): Kubernetes solo puede garantizar runAsNonRoot con un UID numérico, no con un nombre.
 FROM gcr.io/distroless/static:nonroot@sha256:e2e927ec666bae08560abb3c55d0659eceabb657f56b6782ab500a9fc7f555e3
 COPY --from=build /out/worker /worker
-USER nonroot:nonroot
+USER 65532:65532
 ENTRYPOINT ["/worker"]
