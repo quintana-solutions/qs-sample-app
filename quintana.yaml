@@ -16,7 +16,10 @@ services:
     routes:
       - host: sample-api
         exposure: private
-        auth: none   # sso llega en la fase 4b de la plataforma
+        auth: none
+      - host: sample-sso
+        exposure: private
+        auth: sso    # Envoy pide login con Zitadel; la app recibe el usuario en x-id-token
   worker:
     type: worker
     replicas: 1

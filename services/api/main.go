@@ -3,10 +3,13 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -48,6 +51,28 @@ func main() {
 			return
 		}
 		fmt.Fprintf(w, "base %q: %s\n", db, version)
+	})
+
+	// /whoami: en una ruta auth: sso, Envoy ya validó el login y pone el ID token de Zitadel en x-id-token. La app solo
+	// lee sus claims (no verifica la firma: confía en el Gateway, el único camino para llegar a ella).
+	http.HandleFunc("/whoami", func(w http.ResponseWriter, r *http.Request) {
+		tok := r.Header.Get("x-id-token")
+		parts := strings.Split(tok, ".")
+		if len(parts) != 3 {
+			fmt.Fprintln(w, "anónimo (esta ruta no pide login)")
+			return
+		}
+		payload, err := base64.RawURLEncoding.DecodeString(parts[1])
+		var claims struct {
+			Sub   string `json:"sub"`
+			Email string `json:"email"`
+			Name  string `json:"name"`
+		}
+		if err != nil || json.Unmarshal(payload, &claims) != nil {
+			http.Error(w, "x-id-token ilegible", http.StatusBadRequest)
+			return
+		}
+		fmt.Fprintf(w, "hola %s <%s> (sub %s)\n", claims.Name, claims.Email, claims.Sub)
 	})
 
 	log.Printf("api escuchando en :%s", port)
