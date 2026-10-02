@@ -21,3 +21,5 @@ services:
     type: worker
     replicas: 1
     env: { INTERVAL: 30s }
+database:
+  postgres: true   # su propio Postgres (CloudNativePG); llega como DATABASE_URL
